@@ -1,0 +1,21 @@
+# Rubric: is this a good first issue?
+
+<!--
+Five checks: two for the repo (alive, in use), one for scope, one for
+claims, one for contribution policy. Every threshold is measured against
+the bundle's capture date in eval mode and against today in live mode.
+-->
+
+## Checks
+
+| Check | Evidence | Pass condition | Weight |
+|---|---|---|---|
+| repo-alive | Repo facts: the `archived:` flag on the repo line, and `last push to any branch` | Pass when `archived: no` AND the last push is within 180 days of the capture date (live mode: of today). Fail when the repo is archived, or the last push is older than 180 days. | required |
+| maintainer-active | Repo facts: the last 5 default-branch commits (author and date) and the maintainer first-response sample; the Comments section (author_association badges) | Pass when at least one of: (a) a commit in the last 5 default-branch commits within 90 days of capture that is authored by a human or is a bot merging a human's PR; (b) at least one issue in the first-response sample got an OWNER/MEMBER/COLLABORATOR reply within 90 days; (c) an OWNER/MEMBER/COLLABORATOR commented in this issue's thread within 180 days. Fail when none of (a) to (c) holds. | preferred |
+| scope-bounded | Issue title and body; the Comments section; `linked PRs` states in repo facts | Pass when the issue asks for one concrete change with a stated expected outcome (a bug that names the wrong behavior and the expected behavior, or a docs/feature change with a named target). A bug report filed by a maintainer (OWNER/MEMBER/COLLABORATOR) passes even with a terse body: the title plus a bug label state the defect and the expected behavior is its absence. Fail when ANY of: the title or body calls itself an umbrella, tracking, mega, or meta issue, asks for a change spanning the whole codebase or many unrelated modules, or lists 3 or more sub-tasks that are separate deliverables meant to be split into their own PRs (numbered causes of one bug, instances of the same defect, steps of one coherent change, and optional follow-up suggestions do NOT count as sub-tasks); a maintainer says the design is undecided or the change needs core/architecture work, with no later maintainer comment settling it; the issue has 2 or more closed-unmerged linked PRs; the body is a feature wish from a non-maintainer with no description of expected behavior, or its deliverable depends on an asset, input, or product decision the issue leaves undefined (for example marked "TBD"); the issue is a usage or support question rather than a change. A short body, a checklist, or a missing repro is NOT a fail on its own. | required |
+| unclaimed | Repo facts: `this issue: assignees:` and `linked PRs:` with their states; the Comments section (claim comments and their dates) | Pass when assignees is `none`, no linked PR is `open`, and the newest claim comment ("I'll take this", "working on this", "/assign", "opened PR #N") is either absent, older than 90 days with no open PR, or was answered by a maintainer saying the issue is free. Fail when an assignee is set, or any linked PR is open (a bot nudge does not clear an assignee or an open PR), or a claim comment is 90 days old or newer with no maintainer release. Closed-unmerged PRs are abandoned attempts and do not block. | required |
+| ai-policy-ok | Repo facts: the `contribution policy` line (CONTRIBUTING.md, AI policy files, templates) | Pass when the policy line reports no statement, no CONTRIBUTING.md, or conditions only (disclosure, personal understanding, testing, human review of AI output, AGENTS.md present). Fail when the policy states that AI-generated code or documentation is not accepted, banned, or that PRs made with AI are closed regardless of review. "Discourages" plus "closed if not human-reviewed" is a condition, not a ban: pass. | required |
+
+## Verdict rule
+
+Accept when every `required` check passes: repo-alive, scope-bounded, unclaimed, and ai-policy-ok. Any `required` fail rejects. `unclear` on a required check counts as fail: an issue whose liveness, scope, claim state, or policy cannot be verified from the evidence is not a safe first issue. The `preferred` check (maintainer-active) never changes the verdict; among accepted issues, rank the ones that pass it above the ones that do not.
