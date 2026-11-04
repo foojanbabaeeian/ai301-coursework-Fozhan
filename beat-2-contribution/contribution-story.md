@@ -55,10 +55,19 @@ happened; these entries are the toolkit's own timeline.
 All four entries are graded. Keep every heading below, and fill each
 one in the week it belongs to.
 
-**Unit 5: [one line on the tool work]**
+**Unit 5: Turned my unit 1 grader into issue-scout and ran it on GitHub and the course site**
 
-[2-4 sentences: what you built (the scout, your strategy), what broke
-or fell short, what changed because of it.]
+I wrote three `gh search issues` queries from my fit profile (Flask, pygame,
+scikit-learn, PyTorch, Flutter) and six ranking rules, after a plain "good first
+issue + Python" search came back with 54 of 100 results from one personal repo.
+The real scan graded five issues and accepted one, but its top five ignored my
+"avoid frontend" line because my ranking had no fit step, and three of the five
+already had open PRs that my "fewest comments first" order could not see. When I
+checked the course site's list the same way, six issues that looked free had a
+claim comment in the thread, so I logged that the unclaimed check has to read
+comments and read every thread myself before grading my picks (ecotrace #232 and
+codex-lb #1870, both accepted); I also logged that the scope check passed the much
+larger codex-lb issue too easily, to revisit with next week's scope patch.
 
 **Unit 6: [one line on the tool work]**
 
