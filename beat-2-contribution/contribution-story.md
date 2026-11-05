@@ -98,10 +98,19 @@ template; the other two were results I described without pasting the output. I
 kept every template item but dropped the emoji, and pasted the Pushgateway and
 planted-bug output into the description.
 
-**Unit 8: [one line on the tool work]**
+**Unit 8: Wrote my playbook from ecotrace's real response times and ran the PR monitor on PR #250**
 
-[2-4 sentences: the PR-monitor and your playbook. What it read, what it
-drafted, what you did with the draft.]
+My playbook sets a 4-day first-review threshold. I picked it after measuring
+that Zwony answered the six most recent merged outside PRs within 13 minutes to
+14 hours, while open PR #248 had waited about 2 days. It also has one-nudge
+rules taken from my voice guide's ping rule, a rule that bot comments are not
+feedback, and walk-away criteria. The monitor read PR #250 (open, merge state
+blocked pending review, SonarCloud passing) and labelled it `FEEDBACK-IN`,
+because its state check counts the SonarCloud bot's "Quality Gate passed"
+comment as review feedback. The draft it produced, guided by my bot rule and
+threshold, was "wait, nothing to send", with the first possible nudge on
+2026-11-09. I sent nothing, and will re-run it after that date if no maintainer
+has commented.
 
 ---
 
@@ -514,8 +523,13 @@ with 4 commits. It follows ecotrace's PR template item by item:
 
 **Maintainer Feedback:**
 
-- 2026-11-04: none yet. CI has not run: GitHub holds workflows from a
-  first-time contributor's fork until a maintainer approves them.
+- 2026-11-04: none yet. The only comment is the SonarCloud bot's
+  "Quality Gate passed" (0 new issues). CI has not run, because GitHub holds
+  workflows from a first-time contributor's fork until a maintainer approves
+  them.
+- 2026-11-04: ran the PR monitor with my playbook. It drafted "wait, nothing
+  to send", and my first possible nudge is 2026-11-09 under my 4-day threshold.
+  Nothing posted.
 
 **Status:** Awaiting review
 
@@ -546,25 +560,80 @@ with 4 commits. It follows ecotrace's PR template item by item:
 
 **Technical Skills Gained**
 
-[What you learned technically, named concretely.]
+- **The Prometheus text exposition format:** `# HELP` and `# TYPE` lines,
+  label-value escaping (the backslash first, then quotes and newlines), the
+  `NaN`/`+Inf`/`-Inf` spellings, and the trailing newline.
+- **How a Prometheus Pushgateway groups metrics:** the group is the URL path
+  (job plus grouping labels, with `@base64` for awkward values), and a POST
+  replaces same-named metrics within its group, so labels in the body cannot
+  keep two pushes apart.
+- **Fitting into an existing plugin interface:** reading `core.py`'s exporter
+  dispatch instead of trusting its docstring, and matching `WebhookExporter`'s
+  conventions (guarded import, inert without `requests`, errors logged, never
+  raised).
+- **Testing with `unittest.mock.patch` and `caplog`**, and checking the tests
+  themselves by planting bugs one at a time to see which ones they miss.
+- **Git across a fork:** `origin` and `upstream`, branching from `upstream/main`,
+  a throwaway `git worktree` to run new tests against unchanged `main`, and
+  keeping working files out of a PR with `.git/info/exclude`.
+- **Running a real dependency in Docker** (`prom/pushgateway`) to check
+  behaviour that mocks cannot show.
 
 **Challenges Overcome**
 
-[What was hard and how you solved it; point at the real events, the
-Toolkit blocks above are full of them.]
+- **A design bug my own tests could not see.** My first build pushed every
+  measurement to one job-only URL, and all 8 mocked tests passed. plan-check
+  rejected the plan, and an independent code review found from the Pushgateway
+  docs that each push would wipe the previous function's data. A real
+  Pushgateway in Docker confirmed it, and I fixed it with a grouping key
+  (`703c4d0`; see Implementation Notes, "night").
+- **Weak spots in my tests.** A test-coverage review planted bugs and found four
+  that slipped through. I added a test for each, and all 12 planted bugs now
+  fail at least one test.
+- **Windows friction:**
+  - Avast intercepting TLS for `pip`;
+  - the voice guard crashing on an emoji until `PYTHONUTF8=1` was set;
+  - the ship-gate running checks in a fresh `cmd` without my venv, so every
+    manifest command names `.venv\Scripts\python.exe`.
+- **Claimed issues that looked free.** Six "free" issues on the course site had
+  claim comments that the assignee and linked-PR fields don't show, so I read
+  every thread myself before choosing.
+- **My own voice rules stopping my posts.** The guard stopped my claim once and
+  my PR description three times, each time for something I had asserted without
+  showing it, or for emoji. Each time the fix was to paste the output.
 
 **What I'd Do Differently Next Time**
 
-[Reflection on your process.]
+- **Run plan-check before writing code, not after.** The plan-check rejection
+  arrived after I had committed the first version; earlier, it would have saved
+  a fix commit.
+- **Test anything I mock against the real thing once.** When the network or a
+  service is mocked, one run against the real service (here a Docker
+  Pushgateway) catches what the mocks hide.
+- **Get the independent review in before the first commit, not the last.**
+- **Read the protocol docs for the system I'm pushing to.** Here, that was the
+  Pushgateway README, before choosing a URL.
+- **Scope the ranking before the search.** My scout's scan ranked by recency and
+  comment count, and surfaced claimed and off-profile issues. I would give it a
+  fit step and a per-query quota before spending another scan.
 
 ---
 
 ## Resources Used
 
-[What actually helped, not a reading list. List things this story
-already shows you using: the doc you followed to set the environment
-up, the thread that explained the bug, the person who answered you.
-One real entry beats ten plausible ones.]
-
-- [Link to documentation that helped]
-- [Discussion, issue, or post that helped]
+- ecotrace `CONTRIBUTING.md` and `.github/workflows/ci.yml`: the setup, test and
+  lint commands, the Python 3.8 to 3.14 range, and the commit style I followed.
+  https://github.com/Zwony/ecotrace/blob/main/CONTRIBUTING.md
+- `ecotrace/exporters/webhook.py`, the exporter pattern the issue pointed to and
+  that my exporter copies.
+- Issue #232, the owner's spec (file path, metric names, `requests` only,
+  mocked tests): https://github.com/Zwony/ecotrace/issues/232
+- The Prometheus Pushgateway README, which the code review used to find the
+  grouping bug and which documents the POST semantics and `@base64` grouping
+  labels: https://github.com/prometheus/pushgateway
+- The `prom/pushgateway` Docker image (v1.11.1), which I used to confirm the bug
+  and the fix: https://hub.docker.com/r/prom/pushgateway
+- The `gh search issues` manual, for my scout's queries:
+  https://cli.github.com/manual/gh_search_issues
+- The AI301 unit 5 to 8 starter repos (issue-scout, voice guard, ship-gate, PR
+  monitor) and the AI301 Issue Selection site, where I found the issue.
