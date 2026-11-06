@@ -109,8 +109,9 @@ blocked pending review, SonarCloud passing) and labelled it `FEEDBACK-IN`,
 because its state check counts the SonarCloud bot's "Quality Gate passed"
 comment as review feedback. The draft it produced, guided by my bot rule and
 threshold, was "wait, nothing to send", with the first possible nudge on
-2026-11-09. I sent nothing, and will re-run it after that date if no maintainer
-has commented.
+2026-11-09. I sent nothing. The threshold held up: Zwony approved and merged
+the PR on 2026-11-06, two days in and before any nudge was due, so the wait the
+monitor drafted was the right move.
 
 ---
 
@@ -396,8 +397,10 @@ numbers below are from the final branch, `4c36dde`):
    results I described without pasting their output. Every result claimed in the
    PR now has its output next to it.
 
-Not covered: Python 3.8 to 3.14. CI's matrix checks those, and the code avoids
-syntax newer than 3.8.
+Not covered locally: Python 3.8 to 3.14. I relied on CI's matrix for those, and
+on 2026-11-06, once the maintainer approved the workflows for my fork, it passed
+on 3.8, 3.9, 3.10, 3.11, 3.12, 3.13 and 3.14-dev, along with CodeQL and
+SonarCloud.
 
 **Toolkit**
 
@@ -477,6 +480,28 @@ voice guard then stopped my PR description three times before it passed (emoji
 from the repo's template, and two results I described without pasting the
 output).
 
+**2026-11-05: correcting my AI disclosure**
+
+While working on a second PR, my voice guard stopped an AI-use line that said I
+had run the commands myself. Claude Code had actually run them. That made me
+look again at PR #250, which said the same thing: "I checked every change, ran
+every command shown here myself". It was not accurate: I directed the work and
+reviewed every change and output, but Claude Code ran most of the commands. My
+voice-guide rule "Own the AI help plainly" assumed I would always run commands
+myself, so it blocked even the honest version. I rewrote the rule: I say plainly
+what the tool did and what I did, never claim a run the tool made, and post only
+real output that I have read. Then I corrected PR #250's description. The guard
+passed it once I also pasted the output behind two more claims (the flake8 run
+and the gateway state after the DELETE).
+
+**2026-11-06: approved and merged**
+
+Zwony approved the PR without asking for changes: "Reviewed the Pushgateway
+exporter, grouping-key escaping, exposition format, and EcoTrace callback
+integration… 33 passed". CI passed on Python 3.8 to 3.14-dev, and the PR was
+merged as `736dc14`, closing issue #232. It merged two days after opening, before
+my 4-day nudge threshold, so no nudge was ever needed.
+
 **Toolkit**
 
 - Tool: Claude Code as a pair, plus the course's ship-gate manifest; I read and
@@ -519,7 +544,11 @@ with 4 commits. It follows ecotrace's PR template item by item:
   - the awkward-name and DELETE results;
   - the test counts (33 exporter tests; 266 passed overall versus 251 on main);
   - a collapsed planted-bug table.
-- **AI assistance,** in my own words.
+- **AI assistance,** in my own words. On 2026-11-05 I corrected this line: the
+  first version said I "ran every command shown here myself", but Claude Code
+  ran most of them at my direction. It now says plainly what the tool ran and
+  that I directed the work and reviewed every change and output (see
+  Implementation Notes).
 
 **Maintainer Feedback:**
 
@@ -530,8 +559,16 @@ with 4 commits. It follows ecotrace's PR template item by item:
 - 2026-11-04: ran the PR monitor with my playbook. It drafted "wait, nothing
   to send", and my first possible nudge is 2026-11-09 under my 4-day threshold.
   Nothing posted.
+- 2026-11-06: Zwony approved the PR: "Reviewed the Pushgateway exporter,
+  grouping-key escaping, exposition format, and EcoTrace callback integration.
+  Validation: python -m pytest tests/test_exporters.py -q — 33 passed." There
+  were no change requests. After approving the workflows, CI passed on Python
+  3.8 to 3.14-dev, plus CodeQL and SonarCloud.
+- 2026-11-06 17:43 UTC: Zwony merged the PR into `main` (merge commit
+  `736dc14`), and issue #232 closed as completed. `ecotrace/exporters/prometheus.py`
+  is now in the upstream repo.
 
-**Status:** Awaiting review
+**Status:** Merged (2026-11-06)
 
 **Toolkit**
 
